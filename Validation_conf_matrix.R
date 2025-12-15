@@ -21,9 +21,9 @@ source('plot.boxes.R')
 
 # Paths 
 #way = 'ind'
-model = '2025_06_16_birchmouse_3.pt'
+#model = '2025_10_30_model8_birch_mice.pt'
 
-folder= "model3"
+folder= "model8"
 graph = "conf_matrix.pdf"
 
 
@@ -298,55 +298,56 @@ dev.off()
 message('Done.')
 
 
-# Adjust width to make room for table
-pdf(path_pdf, 
-    width = length(unique(class_results$d)) + 4,
-    height = length(unique(class_results$g)))
-par(mar = c(4, 5, 1, 1))  # Smaller right margin
+# # Adjust width to make room for table
+# pdf(path_pdf, 
+#     width = length(unique(class_results$d)) + 4,
+#     height = length(unique(class_results$g)))
+# par(mar = c(4, 5, 1, 1))  # Smaller right margin
+# 
+# # Start plot
+# plot(seq_along(levels), type = 'n', xlab = '', ylab = '',
+#      xlim = c(0.5, length(unique(class_results$d)) + 3.5),  # widen x axis for table
+#      ylim = c(0.5, length(unique(class_results$g)) + 0.5),
+#      xaxt = 'n', yaxt = 'n')
+# 
+# # Draw confusion matrix
+# for (lev_i in unique(class_results$d)) {
+#   for (lev_j in unique(class_results$g)) {
+#     i <- which(rownames(conf_matrix) == lev_i)
+#     j <- which(colnames(conf_matrix) == lev_j)
+#     rect(i - 0.5, j - 0.5, i + 0.5, j + 0.5,
+#          col = colors[as.numeric(percentages[i, j] + 1)])
+#     text(i, j, labels = conf_matrix[i, j], col = 'white', cex = 1.5)
+#   }
+# }
+# 
+# # Axis labels
+# mtext('Ground truth', 2, 3.5)
+# mtext('BatNet', 1, 2.5)
+# mtext(sort(unique(class_results$d)), side = 1, 
+#       at = seq_along(unique(class_results$d)), line = 0.75)
+# mtext(sort(unique(class_results$g)), side = 2, 
+#       at = seq_along(unique(class_results$g)), las = 2, line = 0.5)
+# 
+# # Add a table of metrics
+# metrics_x <- length(unique(class_results$d)) + 1.5  # Start of metrics table
+# metrics_y_start <- length(unique(class_results$g)) + 0.5
+# line_spacing <- 0.6
+# 
+# metrics <- c("Overall",
+#              sprintf("Accuracy = %.2f", round(accuracy_overall, 2)),
+#              "Detection",
+#              sprintf("Accuracy = %.2f", round(accuracy_detection, 2)),
+#              sprintf("Precision = %.2f", round(precision_detection, 2)),
+#              sprintf("Recall = %.2f", round(recall_detection, 2)),
+#              sprintf("F1 Score = %.2f", round(f1_detection, 2)),
+#              "Classification",
+#              sprintf("Accuracy = %.2f", round(accuracy_classification, 2)))
+# 
+# # Draw table background and text
+# for (i in seq_along(metrics)) {
+#   rect(metrics_x - 0.5, metrics_y_start - i + 0.2,
+#        metrics_x + 2.5, metrics_y_start - i - 0.2, col = "white", border = NA)
+#   text(metrics_x, metrics_y_start - i, labels = metrics[i], adj = 0, cex = 0.85)
+# }
 
-# Start plot
-plot(seq_along(levels), type = 'n', xlab = '', ylab = '',
-     xlim = c(0.5, length(unique(class_results$d)) + 3.5),  # widen x axis for table
-     ylim = c(0.5, length(unique(class_results$g)) + 0.5),
-     xaxt = 'n', yaxt = 'n')
-
-# Draw confusion matrix
-for (lev_i in unique(class_results$d)) {
-  for (lev_j in unique(class_results$g)) {
-    i <- which(rownames(conf_matrix) == lev_i)
-    j <- which(colnames(conf_matrix) == lev_j)
-    rect(i - 0.5, j - 0.5, i + 0.5, j + 0.5,
-         col = colors[as.numeric(percentages[i, j] + 1)])
-    text(i, j, labels = conf_matrix[i, j], col = 'white', cex = 1.5)
-  }
-}
-
-# Axis labels
-mtext('Ground truth', 2, 3.5)
-mtext('BatNet', 1, 2.5)
-mtext(sort(unique(class_results$d)), side = 1, 
-      at = seq_along(unique(class_results$d)), line = 0.75)
-mtext(sort(unique(class_results$g)), side = 2, 
-      at = seq_along(unique(class_results$g)), las = 2, line = 0.5)
-
-# Add a table of metrics
-metrics_x <- length(unique(class_results$d)) + 1.5  # Start of metrics table
-metrics_y_start <- length(unique(class_results$g)) + 0.5
-line_spacing <- 0.6
-
-metrics <- c("Overall",
-             sprintf("Accuracy = %.2f", round(accuracy_overall, 2)),
-             "Detection",
-             sprintf("Accuracy = %.2f", round(accuracy_detection, 2)),
-             sprintf("Precision = %.2f", round(precision_detection, 2)),
-             sprintf("Recall = %.2f", round(recall_detection, 2)),
-             sprintf("F1 Score = %.2f", round(f1_detection, 2)),
-             "Classification",
-             sprintf("Accuracy = %.2f", round(accuracy_classification, 2)))
-
-# Draw table background and text
-for (i in seq_along(metrics)) {
-  rect(metrics_x - 0.5, metrics_y_start - i + 0.2,
-       metrics_x + 2.5, metrics_y_start - i - 0.2, col = "white", border = NA)
-  text(metrics_x, metrics_y_start - i, labels = metrics[i], adj = 0, cex = 0.85)
-}

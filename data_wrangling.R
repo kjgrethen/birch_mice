@@ -129,7 +129,7 @@ files[random_indices, select := TRUE]
 #save table of images to check for being empty
 fwrite(
   files[select == "TRUE",],
-  file = file.path(data_path, "pot_empty_files.csv"),
+  file = file.path(data_path, "pot_empty_files_1.csv"),
   sep = ",",
   quote = TRUE,      # ensures special characters are preserved safely
   bom = TRUE         # adds UTF-8 BOM for better compatibility (especially with Excel)
@@ -141,11 +141,26 @@ files[random_indices, select2 := TRUE]
 #save table of images to check for being empty
 fwrite(
   files[select2 == "TRUE",],
+  file = file.path(data_path, "pot_empty_files_2.csv"),
+  sep = ",",
+  quote = TRUE,      # ensures special characters are preserved safely
+  bom = TRUE         # adds UTF-8 BOM for better compatibility (especially with Excel)
+)
+
+check = fread(file.path(data_path,"pot_empty_files_old.csv"))
+
+random_indices = sample(files[annot == FALSE & orig_annot == FALSE & !(filepath %in% check$filepath), which = TRUE], 500)
+files[random_indices, select3 := TRUE]
+
+#save table of images to check for being empty
+fwrite(
+  files[select3 == "TRUE",],
   file = file.path(data_path, "pot_empty_files.csv"),
   sep = ",",
   quote = TRUE,      # ensures special characters are preserved safely
   bom = TRUE         # adds UTF-8 BOM for better compatibility (especially with Excel)
 )
+
 
 #check Z:\2021\Energinet\Kameraer_Gesten_Egholtvej16\Kamera07_OK -> images not in folder below also again in 08 vvul as fcat
 
