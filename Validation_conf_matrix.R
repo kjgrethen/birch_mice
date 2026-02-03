@@ -23,19 +23,20 @@ source('plot.boxes.R')
 #way = 'ind'
 #model = '2025_10_30_model8_birch_mice.pt'
 
-folder= "model8"
-graph = "conf_matrix.pdf"
+folder= "model10"
+graph = "conf_matrix10.pdf"
 
 
-path_data = file.path('C:/Users/au784040/Documents_C/birch_mice_noVC', folder)
+path_data = file.path('C:/Users/au784040/Documents_C/birch_mice_project', folder)
 #path_signe = 'analysis/results/annotations_signe'
 #path_test_set = 'analysis/results/annotations_signe_for_batnet/testing'
 #path_batnet = sprintf(
 #  'analysis/results/batnet/2024_03_31_%s_%s/detected_bats.csv', way, model)
-path_pdf = file.path('C:/Users/au784040/Documents_C/birch_mice_noVC', folder, graph) 
+path_pdf = file.path('C:/Users/au784040/Documents_C/birch_mice_project', folder, graph) 
 
 # Load data and function
 batnet = fread(file.path(path_data, "model_outcome.csv"))
+
 manual = fread(file.path(path_data, "ground_truth.csv"))
 
 # Report issues
@@ -57,14 +58,14 @@ batnet[Species == "Myotis bechsteinii", Code := "vole"]
 manual[Species == "Eptesicus serotinus", Code := "shrew"]
 batnet[Species == "Eptesicus serotinus", Code := "shrew"]
 
-manual[Species == "Rhinolophus sp.", Code := "bird"]
-batnet[Species == "Rhinolophus sp.", Code := "bird"]
+#manual[Species == "Rhinolophus sp.", Code := "bird"]
+#batnet[Species == "Rhinolophus sp.", Code := "bird"]
 
-manual[Species == "Pipistrellus sp.", Code := "small_animal"]
-batnet[Species == "Pipistrellus sp.", Code := "small_animal"]
+#manual[Species == "Pipistrellus sp.", Code := "small_animal"]
+#batnet[Species == "Pipistrellus sp.", Code := "small_animal"]
 
-manual[Species == "Nyctalus noctula", Code := "large_animal"]
-batnet[Species == "Nyctalus noctula", Code := "large_animal"]
+#manual[Species == "Nyctalus noctula", Code := "large_animal"]
+#batnet[Species == "Nyctalus noctula", Code := "large_animal"]
 
 #manual[Species == "Not-A-Bat", Code := "other"]
 #batnet[Species == "Not-A-Bat", Code := "other"]
@@ -79,12 +80,16 @@ manual = manual[manual$Species != '',]
 batnet = batnet[batnet$Species != '',]
 batnet = batnet[batnet$Species !='Not-A-Bat',]
 
+#batnet = batnet[Flag != "unsure", ]
+
 batnet = as.data.frame(batnet)
 manual = as.data.frame(manual)
 
 # Create place holders for output
 fps = fns = tps = c()
 class_results = data.frame()
+
+
 
 # Run through images
 for(image in images){
@@ -198,7 +203,7 @@ if(any(!rownames(manual[manual$Multiple != 'empty',]) %in%
 
 # Create confusion matrix
 #levels = sort(unique(c(class_results$d, class_results$g)))
-levels = c("empty", "small_animal", "large_animal", "bird", "mouse", "shrew", "vole")
+levels = c("empty", "mouse", "shrew", "vole")
 class_results$g = factor(class_results$g, levels = levels)
 class_results$d = factor(class_results$d, levels = levels)
 

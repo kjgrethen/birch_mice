@@ -1,5 +1,6 @@
 # Script to prepare tarining data from birch mouse project 
 library(data.table) # data.frames better
+library(jsonlite)
 
 #clear workspace
 rm(list = ls())
@@ -7,7 +8,7 @@ rm(list = ls())
 set.seed(42)
 
 #set path
-data_path = file.path("C:/Users/au784040/Documents_C/birch_mice_noVC/training")
+data_path = file.path("C:/Users/au784040/Documents_C/birch_mice_project/training")
 
 training_data = data.table(image = character(1000), annot = character(1000))
 
@@ -71,3 +72,124 @@ fwrite(
   quote = TRUE,      # ensures special characters are preserved safely
   bom = TRUE         # adds UTF-8 BOM for better compatibility (especially with Excel)
 )
+
+
+
+#------------extract only mice, shrews and voles ---------------------
+
+dest_dir = "training_set5"
+source_dir = "training_set4" 
+
+
+#training
+tr_data = list.files(file.path(data_path, source_dir, "training_images"))
+tr_annot = list.files(file.path(data_path, source_dir, "training_annotations"))
+
+#validation
+val_data = list.files(file.path(data_path, source_dir, "validation_images"))
+val_annot = list.files(file.path(data_path, source_dir, "validation_annotations"))
+
+
+species_patterns <- paste(
+  unique(na.omit(str_extract(paste(tr_data,val_data), "(?<=_)[^_\\d]+(?=\\.[Jj][Pp][Gg]$)"))),
+  collapse = "|"
+)
+
+
+sub_tr = tr_data[grepl("mouse|vole|shrew|rat|mole", tr_data) | !grepl(species_patterns, tr_data)]
+unique(str_extract(sub_tr, "(?<=_)[^_\\d]+(?=\\.[Jj][Pp][Gg]$)"))
+sub_tr = sub_tr[!grepl("Mammalia", sub_tr)]
+
+sub_val = val_data[grepl("mouse|vole|shrew|rat|mole", val_data) | !grepl(species_patterns, val_data)]
+unique(str_extract(sub_val, "(?<=_)[^_\\d]+(?=\\.[Jj][Pp][Gg]$)"))
+
+
+
+sub_tr_annot = tr_annot[tools::file_path_sans_ext(tr_annot) %in% tools::file_path_sans_ext(sub_tr)]
+sub_val_annot = val_annot[tools::file_path_sans_ext(val_annot) %in% tools::file_path_sans_ext(sub_val)]
+
+
+file.copy(
+  from = file.path(data_path,source_dir,"training_images", sub_tr),
+  to   = file.path(data_path, dest_dir,"training_images", sub_tr),
+  overwrite = FALSE
+)
+
+file.copy(
+  from = file.path(data_path,source_dir,"validation_images", sub_val),
+  to   = file.path(data_path, dest_dir,"validation_images", sub_val),
+  overwrite = FALSE
+)
+
+file.copy(
+  from = file.path(data_path,source_dir,"training_annotations", sub_tr_annot),
+  to   = file.path(data_path, dest_dir,"training_annotations", sub_tr_annot),
+  overwrite = FALSE
+)
+
+file.copy(
+  from = file.path(data_path,source_dir,"validation_annotations", sub_val_annot),
+  to   = file.path(data_path, dest_dir,"validation_annotations", sub_val_annot),
+  overwrite = FALSE
+)
+
+
+#change boxes for rats (to mice) and moles (to shrews)
+replace_value <- function(x, old, new) {
+  if (is.character(x) && x == old) return(new)
+  if (is.list(x)) return(lapply(x, replace_value, old, new))
+  x
+}
+
+
+json_dir <- "training_annotations"  
+
+json_files <- list.files(file.path(data_path, dest_dir,json_dir), pattern = "\\.json$", full.names = TRUE)
+json_files <- json_files[grepl("rat", basename(json_files), ignore.case = TRUE)]
+
+for (f in json_files) {
+  
+  x <- fromJSON(f, simplifyVector = FALSE)
+  
+  x_new <- replace_value(x, "Pipistrellus sp.", "Barbastella barbastellus")
+  
+  write_json(x_new, f, pretty = TRUE, auto_unbox = TRUE)
+}
+
+json_files <- list.files(file.path(data_path, dest_dir,json_dir), pattern = "\\.json$", full.names = TRUE)
+json_files <- json_files[grepl("mole", basename(json_files), ignore.case = TRUE)]
+
+for (f in json_files) {
+  
+  x <- fromJSON(f, simplifyVector = FALSE)
+  
+  x_new <- replace_value(x, "Pipistrellus sp.", "Eptesicus serotinus")
+  
+  write_json(x_new, f, pretty = TRUE, auto_unbox = TRUE)
+}
+
+json_dir <- "validation_annotations"  
+
+json_files <- list.files(file.path(data_path, dest_dir,json_dir), pattern = "\\.json$", full.names = TRUE)
+json_files <- json_files[grepl("rat", basename(json_files), ignore.case = TRUE)]
+
+for (f in json_files) {
+  
+  x <- fromJSON(f, simplifyVector = FALSE)
+  
+  x_new <- replace_value(x, "Pipistrellus sp.", "Barbastella barbastellus")
+  
+  write_json(x_new, f, pretty = TRUE, auto_unbox = TRUE)
+}
+
+json_files <- list.files(file.path(data_path, dest_dir,json_dir), pattern = "\\.json$", full.names = TRUE)
+json_files <- json_files[grepl("mole", basename(json_files), ignore.case = TRUE)]
+
+for (f in json_files) {
+  
+  x <- fromJSON(f, simplifyVector = FALSE)
+  
+  x_new <- replace_value(x, "Pipistrellus sp.", "Eptesicus serotinus")
+  
+  write_json(x_new, f, pretty = TRUE, auto_unbox = TRUE)
+}
